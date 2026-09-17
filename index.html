@@ -792,7 +792,9 @@
       return "h" + (h >>> 0).toString(36);
     }
     var OWNER_TOKEN = hashCreds(USERNAME, PASSWORD);
-    var STORAGE_KEY = "microsite-data-v3";
+    // One stable save slot — never bump this again; migrate old keys instead
+    var STORAGE_KEY = "microsite-data";
+    var OLD_KEYS = ["microsite-data-v3", "microsite-data-v2", "microsite-data-v1"];
 
     // ===================== ICONS =====================
     var ICONS = {
@@ -841,13 +843,26 @@
       try {
         var saved = localStorage.getItem(STORAGE_KEY);
         if (saved) return JSON.parse(saved);
+        // Migrate data from an older save slot instead of losing it
+        for (var i = 0; i < OLD_KEYS.length; i++) {
+          var old = localStorage.getItem(OLD_KEYS[i]);
+          if (old) {
+            localStorage.setItem(STORAGE_KEY, old);
+            localStorage.removeItem(OLD_KEYS[i]);
+            return JSON.parse(old);
+          }
+        }
       } catch (e) {}
       if (window.EMBEDDED_DATA) return JSON.parse(JSON.stringify(window.EMBEDDED_DATA));
       return JSON.parse(JSON.stringify(DEFAULT_DATA));
     }
 
     function saveData() {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch (e) {
+        toast("⚠️ Couldn't save — private browsing or storage is blocked");
+      }
     }
 
     var data = loadData();
