@@ -591,6 +591,63 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    /* ======= KUUHENKI MASCOT ======= */
+    .mascot {
+      position: fixed;
+      left: 18px;
+      bottom: 14px;
+      z-index: 30;
+      width: 76px;
+      height: auto;
+      cursor: pointer;
+      filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5));
+      animation: floaty 3.5s ease-in-out infinite;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .mascot:hover {
+      animation-play-state: paused;
+      scale: 1.12;
+      rotate: -5deg;
+    }
+
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-9px); }
+    }
+
+    .mascot-bubble {
+      position: fixed;
+      left: 104px;
+      bottom: 56px;
+      z-index: 30;
+      max-width: 220px;
+      background: rgba(10, 16, 42, 0.92);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.45;
+      padding: 10px 14px;
+      border-radius: 14px 14px 14px 4px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      pointer-events: none;
+    }
+
+    .mascot-bubble.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 480px) {
+      .mascot { width: 56px; left: 10px; bottom: 10px; }
+      .mascot-bubble { left: 12px; bottom: 76px; max-width: calc(100vw - 40px); }
+    }
+
     @media (max-width: 480px) {
       body { padding-top: 36px; }
       .avatar { width: 92px; height: 92px; font-size: 34px; }
@@ -709,6 +766,10 @@
       <button class="save-btn" type="submit">Save profile</button>
     </form>
   </div>
+
+  <!-- ======= KUUHENKI COMPANION ======= -->
+  <img id="mascot" class="mascot" src="kuuhenki.png" alt="Kuuhenki" draggable="false" />
+  <div class="mascot-bubble" id="mascot-bubble"></div>
 
   <div class="toast" id="toast"></div>
 
@@ -1151,6 +1212,27 @@
       if (editing) stopEditing();
       renderFooter();
       toast("Logged out");
+    });
+
+    // ===================== KUUHENKI =====================
+    var MASCOT_LINES = [
+      "Hiii~ I'm Kuuhenki 🌙",
+      "Welcome to Ash's links!",
+      "The moon is beautiful tonight ✨",
+      "Kuu~ have a lovely day!",
+      "Psst… try clicking a link 👇",
+      "Columbina says hi! 💙"
+    ];
+
+    var mascotEl = $("mascot");
+    var bubbleEl = $("mascot-bubble");
+    var bubbleTimer = null;
+
+    mascotEl.addEventListener("click", function () {
+      bubbleEl.textContent = MASCOT_LINES[Math.floor(Math.random() * MASCOT_LINES.length)];
+      bubbleEl.classList.add("visible");
+      clearTimeout(bubbleTimer);
+      bubbleTimer = setTimeout(function () { bubbleEl.classList.remove("visible"); }, 2600);
     });
 
     // ===================== MISC =====================
